@@ -154,7 +154,8 @@ function start_vm {
   startup_script="
     gcloud compute instances add-labels ${VM_ID} --zone=${machine_zone} --labels=gh_ready=0 && \\
     RUNNER_ALLOW_RUNASROOT=1 ./config.sh --url https://github.com/${GITHUB_REPOSITORY} --token ${RUNNER_TOKEN} --labels ${VM_ID} --unattended ${ephemeral_flag} --disableupdate && \\
-    ./run.sh
+    ./svc.sh install && \\
+    ./svc.sh start && \\
     gcloud compute instances add-labels ${VM_ID} --zone=${machine_zone} --labels=gh_ready=1
     # 3 days represents the max workflow runtime. This will shutdown the instance if everything else fails.
     echo \"gcloud --quiet compute instances delete ${VM_ID} --zone=${machine_zone}\" | at now + 3 days
@@ -171,7 +172,6 @@ function start_vm {
     mkdir /actions-runner
     cd /actions-runner
     curl -o actions-runner-linux-x64-${runner_ver}.tar.gz -L https://github.com/actions/runner/releases/download/v${runner_ver}/actions-runner-linux-x64-${runner_ver}.tar.gz
-
     tar xzf ./actions-runner-linux-x64-${runner_ver}.tar.gz
     ./bin/installdependencies.sh && \\
     $startup_script"
@@ -179,8 +179,9 @@ function start_vm {
 
   gcloud compute instances create ${VM_ID} \
     --zone=${machine_zone} \
-    ${disk_size_flag} \
     --enable-nested-virtualization \
+    --min-cpu-platform "Intel Haswell" \
+    ${disk_size_flag} \
     --machine-type=${machine_type} \
     --scopes=${scopes} \
     ${service_account_flag} \
@@ -193,7 +194,7 @@ function start_vm {
     && echo "::set-output name=label::${VM_ID}"
 
   safety_off
-  while (( i++ < 72 )); do
+  while (( i++ < 24 )); do
     GH_READY=$(gcloud compute instances describe ${VM_ID} --zone=${machine_zone} --format='json(labels)' | jq -r .labels.gh_ready)
     if [[ $GH_READY == 1 ]]; then
       break
