@@ -179,8 +179,6 @@ function start_vm {
 
   gcloud compute instances create ${VM_ID} \
     --zone=${machine_zone} \
-    #--enable-nested-virtualization \
-    #--min-cpu-platform "Intel Haswell" \
     ${disk_size_flag} \
     --machine-type=${machine_type} \
     --scopes=${scopes} \
