@@ -84,8 +84,7 @@ runs:
   steps:
     - id: gce-github-runner-script
       run: >
-        sudo -i
-        su c2-user -c "${{ github.action_path }}/action.sh
+        ${{ github.action_path }}/action.sh
         --command=${{ inputs.command }}
         --token=${{ inputs.token }}
         --project_id=${{ inputs.project_id }}
@@ -102,5 +101,5 @@ runs:
         --image_family=${{ inputs.image_family }}
         --preemptible=${{ inputs.preemptible }}
         --ephemeral=${{ inputs.ephemeral }}
-        --actions_preinstalled=${{ inputs.actions_preinstalled }}"
+        --actions_preinstalled=${{ inputs.actions_preinstalled }}
       shell: bash
