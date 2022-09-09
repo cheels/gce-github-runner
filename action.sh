@@ -173,7 +173,7 @@ function start_vm {
     curl -o actions-runner-linux-x64-${runner_ver}.tar.gz -L https://github.com/actions/runner/releases/download/v2.296.1/actions-runner-linux-x64-${runner_ver}.tar.gz
     tar xzf ./actions-runner-linux-x64-${runner_ver}.tar.gz
     ./bin/installdependencies.sh && \\
-    $startup_script"
+    su ec2-user -c $startup_script"
   fi
 
   gcloud compute instances create ${VM_ID} \
