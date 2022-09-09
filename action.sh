@@ -167,7 +167,6 @@ function start_vm {
     $startup_script"
   else
     echo "✅ Startup script will install GitHub Actions"
-    startup_script="#!/bin/bash
     mkdir /actions-runner
     cd /actions-runner
     curl -o actions-runner-linux-x64-${runner_ver}.tar.gz -L https://github.com/actions/runner/releases/download/v2.296.1/actions-runner-linux-x64-${runner_ver}.tar.gz
