@@ -167,18 +167,20 @@ function start_vm {
     $startup_script"
   else
     echo "✅ Startup script will install GitHub Actions"
-    sudo -i
+    startup_script="#!/bin/bash
     mkdir /actions-runner
     cd /actions-runner
-    curl -o actions-runner-linux-x64-${runner_ver}.tar.gz -L https://github.com/actions/runner/releases/download/v2.296.1/actions-runner-linux-x64-${runner_ver}.tar.gz
+    curl -o actions-runner-linux-x64-${runner_ver}.tar.gz -L https://github.com/actions/runner/releases/download/v${runner_ver}/actions-runner-linux-x64-${runner_ver}.tar.gz
     tar xzf ./actions-runner-linux-x64-${runner_ver}.tar.gz
-    ./bin/installdependencies.sh && \\
+    ./bin/installdependencies.sh && \\"
     gcloud compute instances add-labels ${VM_ID} --zone=${machine_zone} --labels=gh_ready=0 && \\
     su ec2-user -c "./config.sh --url https://github.com/${GITHUB_REPOSITORY} --token ${RUNNER_TOKEN} --labels ${VM_ID} --unattended ${ephemeral_flag} --disableupdate" && \\
     su ec2-user -c "./run.sh" && \\
     gcloud compute instances add-labels ${VM_ID} --zone=${machine_zone} --labels=gh_ready=1
     # 3 days represents the max workflow runtime. This will shutdown the instance if everything else fails.
     echo \"gcloud --quiet compute instances delete ${VM_ID} --zone=${machine_zone}\" | at now + 3 days
+
+
   fi
 
   gcloud compute instances create ${VM_ID} \
